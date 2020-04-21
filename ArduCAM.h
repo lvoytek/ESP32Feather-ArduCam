@@ -100,32 +100,15 @@
 
 #ifndef ArduCAM_H
 #define ArduCAM_H
+
+#define OV5642_MINI_5MP_PLUS
+#include <Arduino.h>
+#include <pins_arduino.h>
 #include "memorysaver.h"
-#if defined ( RASPBERRY_PI ) 
-#else
-	#include "Arduino.h"
-	#include <pins_arduino.h>
-	#include "memorysaver.h"
-#endif
 
-#if defined (__AVR__)
-#define cbi(reg, bitmask) *reg &= ~bitmask
-#define sbi(reg, bitmask) *reg |= bitmask
-#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-#define cport(port, data) port &= data
-#define sport(port, data) port |= data
-#define swap(type, i, j) {type t = i; i = j; j = t;}
-#define fontbyte(x) pgm_read_byte(&cfont.font[x])  
-#define regtype volatile uint8_t
-#define regsize uint8_t
-#endif
 
-#if defined(__SAM3X8E__)
-
-#define cbi(reg, bitmask) *reg &= ~bitmask
-#define sbi(reg, bitmask) *reg |= bitmask
-
+#define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
+#define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
 #define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
 #define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
 
@@ -133,178 +116,12 @@
 #define sport(port, data) port |= data
 
 #define swap(type, i, j) {type t = i; i = j; j = t;}
+
 #define fontbyte(x) cfont.font[x]  
 
 #define regtype volatile uint32_t
 #define regsize uint32_t
 
-#define PROGMEM
-
-#define pgm_read_byte(x)        (*((char *)x))
-#define pgm_read_word(x)        ( ((*((unsigned char *)x + 1)) << 8) + (*((unsigned char *)x)))
-#define pgm_read_byte_near(x)   (*((char *)x))
-#define pgm_read_byte_far(x)    (*((char *)x))
-#define pgm_read_word_near(x)   ( ((*((unsigned char *)x + 1)) << 8) + (*((unsigned char *)x)))
-#define pgm_read_word_far(x)    ( ((*((unsigned char *)x + 1)) << 8) + (*((unsigned char *)x))))
-#define PSTR(x)  x
-#if defined F
-	#undef F
-#endif
-#define F(X) (X)	
-#endif	
-
-#if defined(ESP8266)
-	#define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
-	#define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
-	#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-	#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-	
-	#define cport(port, data) port &= data
-	#define sport(port, data) port |= data
-	
-	#define swap(type, i, j) {type t = i; i = j; j = t;}
-	
-	#define fontbyte(x) cfont.font[x]  
-	
-	#define regtype volatile uint32_t
-	#define regsize uint32_t
-#endif	
-
-#if defined(__SAMD51__) || defined(__SAMD21G18A__)
-	#define Serial SERIAL_PORT_USBVIRTUAL
-
-	#define cbi(reg, bitmask) *reg &= ~bitmask
-	#define sbi(reg, bitmask) *reg |= bitmask
-
-	#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-	#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-
-	#define cport(port, data) port &= data
-	#define sport(port, data) port |= data
-
-	#define swap(type, i, j) {type t = i; i = j; j = t;}
-	#define fontbyte(x) cfont.font[x]  
-
-	#define regtype volatile uint32_t
-	#define regsize uint32_t
-#endif
-
-#if defined(ESP32)
-	#define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
-	#define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
-	#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-	#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-	
-	#define cport(port, data) port &= data
-	#define sport(port, data) port |= data
-	
-	#define swap(type, i, j) {type t = i; i = j; j = t;}
-	
-	#define fontbyte(x) cfont.font[x]  
-	
-	#define regtype volatile uint32_t
-	#define regsize uint32_t
-#endif
-
-#if defined(__CPU_ARC__)
-	#define cbi(reg, bitmask) *reg &= ~bitmask
-	#define sbi(reg, bitmask) *reg |= bitmask
-	#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-	#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-	#define cport(port, data) port &= data
-	#define sport(port, data) port |= data
-	#define swap(type, i, j) {type t = i; i = j; j = t;}
-	#define fontbyte(x) pgm_read_byte(&cfont.font[x])  
-	#define regtype volatile uint32_t
-	#define regsize uint32_t
-#endif
-
-#if defined (RASPBERRY_PI)
-	#define regtype volatile uint32_t
-	#define regsize uint32_t 
-	#define byte uint8_t
-	#define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
-  #define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
-  #define PROGMEM
-	
-	#define PSTR(x)  x
-	#if defined F
-	#undef F
-	#endif
-	#define F(X) (X)
-#endif
-
-#if defined(ARDUINO_ARCH_NRF52)
-    #define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
-	#define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
-	#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-	#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-	
-	#define cport(port, data) port &= data
-	#define sport(port, data) port |= data
-	
-	#define swap(type, i, j) {type t = i; i = j; j = t;}
-	
-	#define fontbyte(x) cfont.font[x]  
-	
-	#define regtype volatile uint32_t
-	#define regsize uint32_t
-
-#endif
-
-#if defined(TEENSYDUINO)
- #define cbi(reg, bitmask) digitalWriteFast(bitmask, LOW)
- #define sbi(reg, bitmask) digitalWriteFast(bitmask, HIGH)
-#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
- #define cport(port, data) port &= data
-#define sport(port, data) port |= data
- #define swap(type, i, j) {type t = i; i = j; j = t;}
- #define fontbyte(x) cfont.font[x]  
- #define regtype volatile uint8_t
-#define regsize uint8_t
- #endif
-
-#if defined(NRF52840_XXAA)
-
- #define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
- #define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
-
-#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-
-#define cport(port, data) port &= data
-#define sport(port, data) port |= data
-
-#define swap(type, i, j) {type t = i; i = j; j = t;}
-#define fontbyte(x) cfont.font[x]  
-
-#define regtype volatile uint32_t
-#define regsize uint32_t
-
-#define PROGMEM
-
-#if defined F
-	#undef F
-#endif
-#define F(X) (X)
-#endif
-
-#if defined (ARDUINO_ARCH_STM32)
-#define cbi(reg, bitmask) *reg &= ~bitmask
-#define sbi(reg, bitmask) *reg |= bitmask
-
-#define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
-#define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
-
-#define cport(port, data) port &= data
-#define sport(port, data) port |= data
-
-#define swap(type, i, j) {type t = i; i = j; j = t;}
-#define fontbyte(x) cfont.font[x]
-#define regtype volatile uint32_t
-#define regsize uint32_t
-#endif
 
 
 /****************************************************/
@@ -580,17 +397,10 @@
 #define LCD2MCU_MODE       		0x02
 
 #define ARDUCHIP_TIM       		0x03  //Timming control
-#if !(defined OV2640_MINI_2MP)
-	#define HREF_LEVEL_MASK    		0x01  //0 = High active , 		1 = Low active
-	#define VSYNC_LEVEL_MASK   		0x02  //0 = High active , 		1 = Low active
-	#define LCD_BKEN_MASK      		0x04  //0 = Enable, 					1 = Disable
-	#if (defined ARDUCAM_SHIELD_V2)
-		#define PCLK_REVERSE_MASK  	0x08  //0 = Normal PCLK, 		1 = REVERSED PCLK
-	#else
-		#define PCLK_DELAY_MASK  		0x08  //0 = data no delay,		1 = data delayed one PCLK
-	#endif
-	//#define MODE_MASK          		0x10  //0 = LCD mode, 				1 = FIFO mode
-#endif
+#define HREF_LEVEL_MASK    		0x01  //0 = High active , 		1 = Low active
+#define VSYNC_LEVEL_MASK   		0x02  //0 = High active , 		1 = Low active
+#define LCD_BKEN_MASK      		0x04  //0 = Enable, 					1 = Disable
+#define PCLK_DELAY_MASK  		0x08  //0 = data no delay,		1 = data delayed one PCLK
 //#define FIFO_PWRDN_MASK	   		0x20  	//0 = Normal operation, 1 = FIFO power down
 //#define LOW_POWER_MODE			  0x40  	//0 = Normal mode, 			1 = Low power mode
 
@@ -772,66 +582,6 @@ class ArduCAM
 	byte sensor_addr;
 };
 
-#if defined OV7660_CAM	
-	#include "ov7660_regs.h"
-#endif
-
-#if defined OV7725_CAM	
-	#include "ov7725_regs.h"
-#endif
-
-#if defined OV7670_CAM	
-	#include "ov7670_regs.h"
-#endif
-
-#if defined OV7675_CAM
-	#include "ov7675_regs.h"
-#endif
-
-#if ( defined(OV5642_CAM) || defined(OV5642_MINI_5MP) || defined(OV5642_MINI_5MP_BIT_ROTATION_FIXED) || defined(OV5642_MINI_5MP_PLUS) )	
-	#include "ov5642_regs.h"
-#endif
-
-#if (defined(OV3640_CAM) || defined(OV3640_MINI_3MP))	
-	#include "ov3640_regs.h"
-#endif
-
-#if (defined(OV2640_CAM) || defined(OV2640_MINI_2MP) || defined(OV2640_MINI_2MP_PLUS))
-	#include "ov2640_regs.h"
-#endif
-
-#if defined MT9D111A_CAM  || defined MT9D111B_CAM 	
-	#include "mt9d111_regs.h"
-#endif
-
-#if defined MT9M112_CAM	
-	#include "mt9m112_regs.h"
-#endif
-
-#if defined MT9V111_CAM	
-	#include "mt9v111_regs.h"
-#endif
-
-#if ( defined(OV5640_CAM)	|| defined(OV5640_MINI_5MP_PLUS) )
-	#include "ov5640_regs.h"
-#endif
-
-#if defined MT9M001_CAM	
-	#include "mt9m001_regs.h"
-#endif
-
-#if defined MT9T112_CAM	
-	#include "mt9t112_regs.h"
-#endif
-
-#if defined MT9D112_CAM	
-	#include "mt9d112_regs.h"
-#endif
-
-#if defined MT9M034_CAM	
-	#include "mt9m034_regs.h"
-#endif
-
-
+#include "ov5642_regs.h"
 
 #endif
